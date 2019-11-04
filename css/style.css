@@ -1,0 +1,48 @@
+html{
+	font-family: Cinzel,serif;
+}
+h1{
+}
+.innerGrid{
+	display: grid;
+	grid-template-columns:repeat(18, 1fr);
+	grid-template-rows:repeat(10, 1fr);
+	grid-area: 3/1/9/10;
+	/* background-image: url('./assets/background/front.png');
+	background-size: cover; */
+	background-color: orange;
+}
+body{
+	margin: 0px;
+}
+.outerGrid{
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	grid-template-rows: 75px 50px 700px auto;
+	background: cyan;
+}
+header{
+	text-align: center;
+	grid-area: 1/2/2/3;
+}
+nav{
+	text-align: center;
+	grid-area: 2/2/3/3;
+}
+nav a{
+	text-decoration: none;
+}
+nav a:hover{
+	color: green;
+}
+footer{
+	grid-area: 9/2/10/3;
+	text-align: center;
+}
+
+.pSkill1{
+	grid-area: 9/9/10/10;
+}
+.pSkill2{
+	grid-area: 9/10/10/11;
+} 
