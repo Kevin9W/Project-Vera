@@ -3,14 +3,16 @@ html{
 }
 h1{
 }
+.hidden{
+	display: none;
+}
 .innerGrid{
 	display: grid;
-	grid-template-columns:repeat(18, 1fr);
-	grid-template-rows:repeat(10, 1fr);
+	grid-template-columns:auto repeat(20, 50px) auto;
+	grid-template-rows:auto repeat(12, 50px) auto;
 	grid-area: 3/1/9/10;
-	/* background-image: url('./assets/background/front.png');
-	background-size: cover; */
-	background-color: orange;
+	background-image: url('./assets/background/forest-road-preview.png');
+	background-size: contain;
 }
 body{
 	margin: 0px;
@@ -39,10 +41,30 @@ footer{
 	grid-area: 9/2/10/3;
 	text-align: center;
 }
-
+.abort{
+	grid-area: 2/2/2/2;
+}
+.rightP{
+	grid-area: 4/18/5/19;
+	text-align: center;
+	color: gold;
+}
+.leftP{
+	grid-area: 4/5/5/6;
+	text-align: center;
+	color: gold;
+}
 .pSkill1{
-	grid-area: 9/9/10/10;
+	grid-area: 10/10/11/11;
+	text-align: center;
 }
 .pSkill2{
-	grid-area: 9/10/10/11;
+	grid-area: 10/11/11/12;
+	text-align: center;
 } 
+.heal{
+	grid-area: 10/8/11/9;
+}
+.guard{
+	grid-area: 10/12/11/13
+}
