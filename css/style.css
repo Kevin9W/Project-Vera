@@ -6,26 +6,30 @@ h1{
 .hidden{
 	display: none;
 }
-.innerGrid{
-	display: grid;
+.canvas{
+/* 	display: grid;
 	grid-template-columns:auto repeat(20, 50px) auto;
-	grid-template-rows:auto repeat(12, 50px) auto;
-	grid-area: 3/1/9/10;
+	grid-template-rows:auto repeat(12, 50px) auto; */
+	grid-area: 3/2/4/3;
 	background-image: url('./assets/background/forest-road-preview.png');
-	background-size: contain;
+	background-size: contain; 
+/*  	width: 1280;
+	height: 720; */
+	margin: 0px
 }
 body{
 	margin: 0px;
 }
 .outerGrid{
 	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	grid-template-rows: 75px 50px 700px auto;
-	background: cyan;
+	grid-template-columns: 1fr 1280px 1fr;
+	grid-template-rows: 75px 50px 720px auto;
+	background: black;
 }
 header{
 	text-align: center;
 	grid-area: 1/2/2/3;
+	color: white;
 }
 nav{
 	text-align: center;
@@ -38,10 +42,11 @@ nav a:hover{
 	color: green;
 }
 footer{
-	grid-area: 9/2/10/3;
+	grid-area: 4/2/5/3;
 	text-align: center;
+	color: white;
 }
-.abort{
+/* .abort{
 	grid-area: 2/2/2/2;
 }
 .rightP{
@@ -67,4 +72,4 @@ footer{
 }
 .guard{
 	grid-area: 10/12/11/13
-}
+} */

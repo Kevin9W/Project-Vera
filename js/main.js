@@ -53,6 +53,10 @@ class Game{
 		}
 		else return false
 	}
+	endBattle(who){
+		alert(`${who.name} dead!`)
+		this.battleOn=false
+	}
 }
 class Character{
 	constructor(){
@@ -64,8 +68,7 @@ class Character{
 		this.usedSkill=null,
 		this.guard=false,
 		this.stats={
-			maxHealth:100,
-			health:100, 
+			health:10, 
 			strength:10,
 			magic:10,
 			dexterity:10,
@@ -77,7 +80,7 @@ class Character{
 				maxDmg:10
 			},
 			items:{
-				hPotion:{
+				hPot:{
 					name:"Health Potion",
 					heal:30,
 					amount:3
@@ -89,7 +92,7 @@ class Character{
 				name:"Guard",
 				type:"guard"
 			},
-			hPotion:{
+			hPot:{
 				name:"Health Potion",
 				type:"heal"
 			},
@@ -121,8 +124,7 @@ class Character{
 		this.hero=false,
 		this.usedSkill=null,
 		this.stats={
-			maxHealth:150,
-			health:150,
+			health:15,
 			strength:12,
 			dexterity:9
 		},
@@ -166,21 +168,20 @@ class Character{
 		let damage=0;
 		if (skill.type=='physical'){
 			damage=(randomNum(this.equipment.weapon.minDmg,this.equipment.weapon.maxDmg)+this.stats.strength)*skill.multi
+			this.skills.skill2.cooldown--
 		}
 		else if (skill.type=='magic'){
 			damage=(randomNum(this.stats.magic,this.stats.magic/2)+this.stats.magic)*skill.multi
-
+			skill.cooldown=skill.maxCooldown
 		}
 		else if (skill.type=="guard"){
 			this.guard=true
-			game.playerTurn=false
+			this.skills.skill2.cooldown--
 		}
 		else if (skill.type=="heal"){
-			if (this.equipment.items.hPotion.amount>0){
-				this.stats.health=this.stats.health+this.equipment.items.hPotion.heal
-				this.equipment.items.hPotion.amount--
-			}
-			game.playerTurn=false
+			this.stats.health=this.stats.health+this.equipment.items.hPot.heal
+			this.equipment.items.hPot.amount--
+			this.skills.skill2.cooldown--
 		}
 		return damage
 	}
@@ -198,13 +199,18 @@ class Character{
 }
 //---The Buttons---
 	//---Skill 1 button---
-let pSkill1=document.querySelector('.pSkill1')
+let pSkill1=document.querySelector('.pSkill1');
 
 let skill1=()=>{
-	player.usedSkill=player.skills.skill1
-	turnResult(player,enemy,hitResult(player,enemy))
-	rightDamageUI()
-	endBattle(enemy)
+	if (game.battleOn){
+		player.usedSkill=player.skills.skill1
+		turnResult(player,enemy,hitResult(player,enemy))
+		rightDamageUI()
+		if (game.checkAlive(enemy)){
+			setTimeout(()=>{enemyTurn(enemy,player)},2.5*1000)
+		}
+		else game.endBattle(enemy)	
+	}
 }	
 let skill1Ready=function(){
 	pSkill1.addEventListener('click',skill1)
@@ -214,10 +220,19 @@ skill1Ready()
 let pSkill2=document.querySelector('.pSkill2')
 
 let skill2=()=>{
-	player.usedSkill=player.skills.skill2
-	turnResult(player,enemy,hitResult(player,enemy))
-	rightDamageUI()
-	endBattle(enemy)	
+	if(game.battleOn){
+		player.usedSkill=player.skills.skill2
+		console.log(player.usedSkill.cooldown)
+		if (player.usedSkill.cooldown<=0){
+			turnResult(player,enemy,hitResult(player,enemy))
+			rightDamageUI()
+			if (game.checkAlive(enemy)){
+				setTimeout(()=>{enemyTurn(enemy,player)},2.5*1000)
+			}
+			else game.endBattle(enemy)	
+		}
+		else console.log("Please choose another skill")
+	}
 }
 let skill2Ready=function(){
 	pSkill2.addEventListener('click',skill2)
@@ -227,32 +242,43 @@ skill2Ready()
 let guard=document.querySelector('.guard')
 
 let setGuard=()=>{
-	player.usedSkill=player.skills.guard
-	turnResult(player,enemy,true)
-	game.battleResults.skill="Guard"
-	game.battleResults.damage=""
-	leftDamageUI()
-	endBattle(enemy)
+	if (game.battleOn){
+		player.usedSkill=player.skills.guard
+		turnResult(player,enemy,true)
+		game.battleResults.skill="Guard"
+		game.battleResults.damage=""
+		leftDamageUI()
+		if (game.checkAlive(enemy)){
+			setTimeout(()=>{enemyTurn(enemy,player)},2.5*1000)
+		}
+		else game.endBattle(enemy)	
+	}
 }	
 let guardReady=function(){
 	guard.addEventListener('click',setGuard)
 }
 guardReady()
 	//---Health Potion---
-let hPotion=document.querySelector('.heal')
+let hPot=document.querySelector('.heal')
 
 let drinkHPot=()=>{
-	player.usedSkill=player.skills.hPotion
-	turnResult(player,enemy,true)
-	game.battleResults.skill=player.usedSkill.name
-	game.battleResults.damage=player.equipment.items.hPotion.heal
-	leftDamageUI()
-	endBattle(enemy)	
-		
-
+	if (game.battleOn){
+		player.usedSkill=player.skills.hPot
+		if (player.equipment.items.hPot.amount>0){
+			turnResult(player,enemy,true)
+			game.battleResults.skill=player.usedSkill.name
+			game.battleResults.damage=player.equipment.items.hPot.heal
+			leftDamageUI()
+			if (game.checkAlive(enemy)){
+				setTimeout(()=>{enemyTurn(enemy,player)},2.5*1000)
+			}
+			else game.endBattle(enemy)
+		}
+		else console.log("Please choose another skill")
+	}		
 }	
 let hPotReady=function(){
-	hPotion.addEventListener('click',drinkHPot)
+	hPot.addEventListener('click',drinkHPot)
 }
 hPotReady()	
 	//---Abort Button---
@@ -263,19 +289,13 @@ let abortButton=document.querySelector('.abort')
 })
 
 //---The Functions---
-let endBattle=(who)=>{
-	if(game.checkAlive(who)){
-		setTimeout(()=>{enemyTurn(enemy,player)},2.5*1000)
-	}
-	else console.log("Enemy dead!")
-}
+
 let randomNum=function(mina, maxa){
 	let min = Math.ceil(mina);
   	let max = Math.floor(maxa)+1;
   	let result =(Math.floor(Math.random() * (max - min)) + min)
   	return result
 }
-
 
 let noClick=()=>{
 	pSkill1.removeEventListener('click',skill1)
@@ -287,6 +307,7 @@ let noClick=()=>{
 		guardReady()
 	},4*1000)
 }
+
 let rightDamageUI=function(){
 	let rightPopup=document.querySelector('.rightP')
 	let container=document.querySelector('.innerGrid')
@@ -342,6 +363,9 @@ let enemyTurn=function(attacker,defender){
 		turnResult(attacker,defender,hitResult(attacker,defender))
 		attacker.skills.cooldown--
 		leftDamageUI()
+		if (!game.checkAlive(player)){
+			game.endBattle(player)
+		}
 
 	}
 	else if (attacker.skills.ready){
@@ -350,12 +374,18 @@ let enemyTurn=function(attacker,defender){
 		attacker.skills.ready=false
 		attacker.skills.cooldown=attacker.skills.maxCooldown
 		leftDamageUI()
+		if (!game.checkAlive(player)){
+			game.endBattle(player)
+		}
 	}
 	else{
 		attacker.skills.ready=true
 		game.battleResults.skill="The "+attacker.name+ " is rearing up for a big hit!"
 		game.battleResults.damage=""
 		rightDamageUI()
+		if (!game.checkAlive(player)){
+			game.endBattle(player)
+		}
 	}
 }
 
@@ -368,23 +398,6 @@ let enemy=game.enemyList[0]
 let help=document.querySelector('.help')
 help.addEventListener('click',game.helpPage)
 
-//let currentTarget=document.querySelector('.enemy')
-//currentTarget=addEventListener(.)
-
-
-//---The Game---
-
-
-
-console.log("player "+player.stats.health)	
-console.log("enemy "+enemy.stats.health)
-
-
-
-
-
-
-
-
+//---The Canvas---
 
 
