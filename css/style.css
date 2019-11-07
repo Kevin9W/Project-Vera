@@ -7,14 +7,9 @@ h1{
 	display: none;
 }
 .canvas{
-/* 	display: grid;
-	grid-template-columns:auto repeat(20, 50px) auto;
-	grid-template-rows:auto repeat(12, 50px) auto; */
 	grid-area: 3/2/4/3;
 	background-image: url('./assets/background/forest-road-preview.png');
 	background-size: contain; 
-/*  	width: 1280;
-	height: 720; */
 	margin: 0px
 }
 body{

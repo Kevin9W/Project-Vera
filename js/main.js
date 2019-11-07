@@ -68,7 +68,7 @@ class Character{
 		this.usedSkill=null,
 		this.guard=false,
 		this.stats={
-			health:10, 
+			health:100, 
 			strength:10,
 			magic:10,
 			dexterity:10,
@@ -124,7 +124,7 @@ class Character{
 		this.hero=false,
 		this.usedSkill=null,
 		this.stats={
-			health:15,
+			health:150,
 			strength:12,
 			dexterity:9
 		},
@@ -199,25 +199,25 @@ class Character{
 }
 //---The Buttons---
 	//---Skill 1 button---
-let pSkill1=document.querySelector('.pSkill1');
+// let pSkill1=document.querySelector('.pSkill1');
 
 let skill1=()=>{
 	if (game.battleOn){
 		player.usedSkill=player.skills.skill1
 		turnResult(player,enemy,hitResult(player,enemy))
-		rightDamageUI()
+        textUI.updateUI(textUI.right)
 		if (game.checkAlive(enemy)){
 			setTimeout(()=>{enemyTurn(enemy,player)},2.5*1000)
 		}
 		else game.endBattle(enemy)	
 	}
 }	
-let skill1Ready=function(){
-	pSkill1.addEventListener('click',skill1)
-}
-skill1Ready()
+// let skill1Ready=function(){
+// 	pSkill1.addEventListener('click',skill1)
+// }
+// skill1Ready()
 	//---Skill 2 button---
-let pSkill2=document.querySelector('.pSkill2')
+// let pSkill2=document.querySelector('.pSkill2')
 
 let skill2=()=>{
 	if(game.battleOn){
@@ -225,21 +225,25 @@ let skill2=()=>{
 		console.log(player.usedSkill.cooldown)
 		if (player.usedSkill.cooldown<=0){
 			turnResult(player,enemy,hitResult(player,enemy))
-			rightDamageUI()
+      		textUI.updateUI(textUI.right)
 			if (game.checkAlive(enemy)){
 				setTimeout(()=>{enemyTurn(enemy,player)},2.5*1000)
 			}
 			else game.endBattle(enemy)	
 		}
-		else console.log("Please choose another skill")
+		else{
+			game.battleResults.skill="On cooldown "+player.usedSkill.cooldown+" turns left"
+			game.battleResults.damage=""
+			textUI.updateUI(textUI.left)
+		}
 	}
 }
-let skill2Ready=function(){
-	pSkill2.addEventListener('click',skill2)
-}
-skill2Ready()
+// let skill2Ready=function(){
+// 	pSkill2.addEventListener('click',skill2)
+// }
+// skill2Ready()
 	//---Guard Button---
-let guard=document.querySelector('.guard')
+// let guard=document.querySelector('.guard')
 
 let setGuard=()=>{
 	if (game.battleOn){
@@ -247,19 +251,19 @@ let setGuard=()=>{
 		turnResult(player,enemy,true)
 		game.battleResults.skill="Guard"
 		game.battleResults.damage=""
-		leftDamageUI()
+		textUI.updateUI(textUI.left)
 		if (game.checkAlive(enemy)){
 			setTimeout(()=>{enemyTurn(enemy,player)},2.5*1000)
 		}
 		else game.endBattle(enemy)	
 	}
 }	
-let guardReady=function(){
-	guard.addEventListener('click',setGuard)
-}
-guardReady()
+// let guardReady=function(){
+// 	guard.addEventListener('click',setGuard)
+// }
+// guardReady()
 	//---Health Potion---
-let hPot=document.querySelector('.heal')
+// let hPot=document.querySelector('.heal')
 
 let drinkHPot=()=>{
 	if (game.battleOn){
@@ -267,20 +271,26 @@ let drinkHPot=()=>{
 		if (player.equipment.items.hPot.amount>0){
 			turnResult(player,enemy,true)
 			game.battleResults.skill=player.usedSkill.name
-			game.battleResults.damage=player.equipment.items.hPot.heal
-			leftDamageUI()
+			game.battleResults.damage="+"+player.equipment.items.hPot.heal
+			textUI.updateUI(textUI.left)
+       		updateHPot()
 			if (game.checkAlive(enemy)){
 				setTimeout(()=>{enemyTurn(enemy,player)},2.5*1000)
 			}
 			else game.endBattle(enemy)
 		}
-		else console.log("Please choose another skill")
+		else{
+			game.battleResults.skill="Out of health potions!"
+			game.battleResults.damage=""
+			textUI.updateUI(textUI.left)
+
+		}
 	}		
 }	
-let hPotReady=function(){
-	hPot.addEventListener('click',drinkHPot)
-}
-hPotReady()	
+// let hPotReady=function(){
+// 	hPot.addEventListener('click',drinkHPot)
+// }
+// hPotReady()	
 	//---Abort Button---
 let abortButton=document.querySelector('.abort')
 	abortButton.addEventListener('click',function(){
@@ -297,39 +307,28 @@ let randomNum=function(mina, maxa){
   	return result
 }
 
-let noClick=()=>{
-	pSkill1.removeEventListener('click',skill1)
-	pSkill2.removeEventListener('click',skill2)
-	guard.removeEventListener('click',setGuard)
-	setTimeout(()=>{
-		skill1Ready()
-		skill2Ready()
-		guardReady()
-	},4*1000)
-}
-
-let rightDamageUI=function(){
-	let rightPopup=document.querySelector('.rightP')
-	let container=document.querySelector('.innerGrid')
-	rightPopup.innerText=game.battleResults.skill+" "+game.battleResults.damage
-	rightPopup.classList.remove("hidden")
-	container.appendChild(rightPopup)
-	noClick()
-	setTimeout(()=>{
-		rightPopup.classList.add("hidden")
-	},2*1000)
-}
-let leftDamageUI=function(){
-	let leftPopup=document.querySelector('.leftP')
-	let container=document.querySelector('.innerGrid')
-	leftPopup.innerText=game.battleResults.skill+" "+game.battleResults.damage
-	leftPopup.classList.remove("hidden")
-	container.appendChild(leftPopup)
-	noClick()
-	setTimeout(()=>{
-		leftPopup.classList.add("hidden")
-	},2*1000)
-}
+// let rightDamageUI=function(){
+// 	let rightPopup=document.querySelector('.rightP')
+// 	let container=document.querySelector('.innerGrid')
+// 	rightPopup.innerText=game.battleResults.skill+" "+game.battleResults.damage
+// 	rightPopup.classList.remove("hidden")
+// 	container.appendChild(rightPopup)
+// 	noClick()
+// 	setTimeout(()=>{
+// 		rightPopup.classList.add("hidden")
+// 	},2*1000)
+// }
+// let leftDamageUI=function(){
+// 	let leftPopup=document.querySelector('.leftP')
+// 	let container=document.querySelector('.innerGrid')
+// 	leftPopup.innerText=game.battleResults.skill+" "+game.battleResults.damage
+// 	leftPopup.classList.remove("hidden")
+// 	container.appendChild(leftPopup)
+// 	noClick()
+// 	setTimeout(()=>{
+// 		leftPopup.classList.add("hidden")
+// 	},2*1000)
+// }
 let hitResult=function(attacker,defender){
 	let hitResult = attacker.hitDodge() > defender.hitDodge()
 	if (hitResult){
@@ -362,7 +361,8 @@ let enemyTurn=function(attacker,defender){
 		attacker.usedSkill=attacker.skills.skill1
 		turnResult(attacker,defender,hitResult(attacker,defender))
 		attacker.skills.cooldown--
-		leftDamageUI()
+		// leftDamageUI()
+		textUI.updateUI(textUI.left)
 		if (!game.checkAlive(player)){
 			game.endBattle(player)
 		}
@@ -373,7 +373,8 @@ let enemyTurn=function(attacker,defender){
 		turnResult(attacker,defender,true)
 		attacker.skills.ready=false
 		attacker.skills.cooldown=attacker.skills.maxCooldown
-		leftDamageUI()
+		textUI.updateUI(textUI.left)
+		// leftDamageUI()
 		if (!game.checkAlive(player)){
 			game.endBattle(player)
 		}
@@ -382,7 +383,8 @@ let enemyTurn=function(attacker,defender){
 		attacker.skills.ready=true
 		game.battleResults.skill="The "+attacker.name+ " is rearing up for a big hit!"
 		game.battleResults.damage=""
-		rightDamageUI()
+		textUI.updateUI(textUI.right)
+		// rightDamageUI()
 		if (!game.checkAlive(player)){
 			game.endBattle(player)
 		}
