@@ -46,7 +46,9 @@ class Game{
 			}
 		}
 	}
+	updateHealth(){
 
+	}
 	checkAlive(who){
 		if (who.stats.health>0){
 			return true
@@ -60,14 +62,22 @@ class Game{
 }
 class Character{
 	constructor(){
+	this.usedSkill=null
 	}
-
+	showHealth(){
+		let healthBar=document.createElement('progress')
+		healthBar.classList.add('health',this.name)
+		healthBar.setAttribute('value',this.stats.health)
+		healthBar.setAttribute('max',this.stats.maxHP)
+		let outerGrid=document.querySelector('.outerGrid')
+		outerGrid.appendChild(healthBar)
+	}
 	isPlayer(){
 		this.name='Viran',
 		this.hero=true,
-		this.usedSkill=null,
 		this.guard=false,
 		this.stats={
+			maxHP:100,
 			health:100, 
 			strength:10,
 			magic:10,
@@ -118,12 +128,12 @@ class Character{
 			dead:null
 		}
 	}
-
 	isMinotaur(){
 		this.name='Minotaur',
 		this.hero=false,
 		this.usedSkill=null,
 		this.stats={
+			maxHP:150,
 			health:150,
 			strength:12,
 			dexterity:9
@@ -199,8 +209,6 @@ class Character{
 }
 //---The Buttons---
 	//---Skill 1 button---
-// let pSkill1=document.querySelector('.pSkill1');
-
 let skill1=()=>{
 	if (game.battleOn){
 		player.usedSkill=player.skills.skill1
@@ -212,12 +220,6 @@ let skill1=()=>{
 		else game.endBattle(enemy)	
 	}
 }	
-// let skill1Ready=function(){
-// 	pSkill1.addEventListener('click',skill1)
-// }
-// skill1Ready()
-	//---Skill 2 button---
-// let pSkill2=document.querySelector('.pSkill2')
 
 let skill2=()=>{
 	if(game.battleOn){
@@ -238,12 +240,6 @@ let skill2=()=>{
 		}
 	}
 }
-// let skill2Ready=function(){
-// 	pSkill2.addEventListener('click',skill2)
-// }
-// skill2Ready()
-	//---Guard Button---
-// let guard=document.querySelector('.guard')
 
 let setGuard=()=>{
 	if (game.battleOn){
@@ -258,12 +254,6 @@ let setGuard=()=>{
 		else game.endBattle(enemy)	
 	}
 }	
-// let guardReady=function(){
-// 	guard.addEventListener('click',setGuard)
-// }
-// guardReady()
-	//---Health Potion---
-// let hPot=document.querySelector('.heal')
 
 let drinkHPot=()=>{
 	if (game.battleOn){
@@ -287,17 +277,6 @@ let drinkHPot=()=>{
 		}
 	}		
 }	
-// let hPotReady=function(){
-// 	hPot.addEventListener('click',drinkHPot)
-// }
-// hPotReady()	
-	//---Abort Button---
-let abortButton=document.querySelector('.abort')
-	abortButton.addEventListener('click',function(){
-	game.gameOn=false
-	console.log('ABORTED '+game.gameOn)
-})
-
 //---The Functions---
 
 let randomNum=function(mina, maxa){
@@ -307,28 +286,6 @@ let randomNum=function(mina, maxa){
   	return result
 }
 
-// let rightDamageUI=function(){
-// 	let rightPopup=document.querySelector('.rightP')
-// 	let container=document.querySelector('.innerGrid')
-// 	rightPopup.innerText=game.battleResults.skill+" "+game.battleResults.damage
-// 	rightPopup.classList.remove("hidden")
-// 	container.appendChild(rightPopup)
-// 	noClick()
-// 	setTimeout(()=>{
-// 		rightPopup.classList.add("hidden")
-// 	},2*1000)
-// }
-// let leftDamageUI=function(){
-// 	let leftPopup=document.querySelector('.leftP')
-// 	let container=document.querySelector('.innerGrid')
-// 	leftPopup.innerText=game.battleResults.skill+" "+game.battleResults.damage
-// 	leftPopup.classList.remove("hidden")
-// 	container.appendChild(leftPopup)
-// 	noClick()
-// 	setTimeout(()=>{
-// 		leftPopup.classList.add("hidden")
-// 	},2*1000)
-// }
 let hitResult=function(attacker,defender){
 	let hitResult = attacker.hitDodge() > defender.hitDodge()
 	if (hitResult){
@@ -390,16 +347,12 @@ let enemyTurn=function(attacker,defender){
 		}
 	}
 }
-
 //---The Setup---
 let game=new Game()
 let player=new Character()
 player.isPlayer()
 game.createEnemies('boss',1)
 let enemy=game.enemyList[0]
+enemy.showHealth()
 let help=document.querySelector('.help')
 help.addEventListener('click',game.helpPage)
-
-//---The Canvas---
-
-

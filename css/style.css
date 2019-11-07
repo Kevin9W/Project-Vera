@@ -15,6 +15,11 @@ h1{
 body{
 	margin: 0px;
 }
+.health{
+	position: absolute;
+	top: 500px;
+	left: 500px;
+}
 .outerGrid{
 	display: grid;
 	grid-template-columns: 1fr 1280px 1fr;
@@ -41,30 +46,8 @@ footer{
 	text-align: center;
 	color: white;
 }
-/* .abort{
-	grid-area: 2/2/2/2;
+.test{
+	position: absolute;
+	top: 500px;
+	left: 500px;
 }
-.rightP{
-	grid-area: 4/18/5/19;
-	text-align: center;
-	color: gold;
-}
-.leftP{
-	grid-area: 4/5/5/6;
-	text-align: center;
-	color: gold;
-}
-.pSkill1{
-	grid-area: 10/10/11/11;
-	text-align: center;
-}
-.pSkill2{
-	grid-area: 10/11/11/12;
-	text-align: center;
-} 
-.heal{
-	grid-area: 10/8/11/9;
-}
-.guard{
-	grid-area: 10/12/11/13
-} */
