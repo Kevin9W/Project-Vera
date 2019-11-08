@@ -1,5 +1,5 @@
 html{
-	font-family: Cinzel,serif;
+	font-family: Cinzel, serif;
 }
 h1{
 }
@@ -17,8 +17,30 @@ body{
 }
 .health{
 	position: absolute;
-	top: 500px;
-	left: 500px;
+	-webkit-appearance: none;
+	background: darkgray;
+	border-radius: 10px;
+	padding: 2px;
+	width:  250px;
+	height: 20px;
+}
+.health::-webkit-progress-bar{
+	border-radius: 10px;
+	background: black;
+}
+.health::-moz-progress-bar{
+	border-radius: 10px;
+	background: #ab1f1f;
+}
+
+.health::-webkit-progress-value{
+	border-radius: 8px;
+	background-color: #ab1f1f;
+}
+.health::-moz-progress-value{
+	border-radius: 8px;
+	background-color: #ab1f1f;
+
 }
 .outerGrid{
 	display: grid;
@@ -45,9 +67,4 @@ footer{
 	grid-area: 4/2/5/3;
 	text-align: center;
 	color: white;
-}
-.test{
-	position: absolute;
-	top: 500px;
-	left: 500px;
 }

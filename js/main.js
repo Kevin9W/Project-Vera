@@ -7,6 +7,12 @@ class Game{
 			damage:null,
 			playerTurn:true
 		},
+		this.gameResults={
+			loseName:null,
+			winName:null
+		},
+		this.rounds=1,
+		this.warning=false,
 		this.enemyList=[],
 		this.turnOrder=[],
 		this.gameOn=true,
@@ -15,15 +21,7 @@ class Game{
 	}
 
 	helpPage(){
-		let help=document.createElement('div')
-		console.log('Help Screen')
-	}
-
-	turnCheck(player,enemy){
-		if (player.stats.dexterity<enemy.stats.dexterity){
-			console.log('enemy goes first')
-		}
-		else console.log('player goes first')
+		alert("Ghetto help screen! Slash to do physical damage. Fireball to deal magical damage, but it has a 3 turn cooldown. If you see the boss readying a big attack, Guard!. If you're low on health use a health potion! But be careful, you only have 3!")
 	}
 
 	createPlayer(){
@@ -35,7 +33,7 @@ class Game{
 	createEnemies(who, num){
 		if (who=='boss'){
 			let enemy=new Character()
-			enemy.isMinotaur()
+			enemy.isSkeleton()
 			this.enemyList.push(enemy)
 		}
 		if(who=='minion'){
@@ -46,8 +44,13 @@ class Game{
 			}
 		}
 	}
-	updateHealth(){
-
+	updateHealth(attacker,defender){
+		let nameA="#"+attacker.name
+		let nameD="#"+defender.name
+		let healthBarA=document.querySelector(nameA)
+		let healthBarD=document.querySelector(nameD)
+		healthBarA.value=attacker.stats.health
+		healthBarD.value=defender.stats.health
 	}
 	checkAlive(who){
 		if (who.stats.health>0){
@@ -56,7 +59,7 @@ class Game{
 		else return false
 	}
 	endBattle(who){
-		alert(`${who.name} dead!`)
+		setTimeout(()=>{alert(who.name+" has been defeated!")},500)
 		this.battleOn=false
 	}
 }
@@ -64,16 +67,22 @@ class Character{
 	constructor(){
 	this.usedSkill=null
 	}
-	showHealth(){
+	showHealth(x,y){
 		let healthBar=document.createElement('progress')
-		healthBar.classList.add('health',this.name)
+		healthBar.classList.add('health')
+		healthBar.setAttribute('id',this.name)
 		healthBar.setAttribute('value',this.stats.health)
 		healthBar.setAttribute('max',this.stats.maxHP)
+		if (!this.hero){
+			healthBar.style.transform='rotate(180deg)'
+		}
+		healthBar.style.top=y+"px"
+		healthBar.style.left=x+"px"
 		let outerGrid=document.querySelector('.outerGrid')
 		outerGrid.appendChild(healthBar)
 	}
 	isPlayer(){
-		this.name='Viran',
+		this.name='You',
 		this.hero=true,
 		this.guard=false,
 		this.stats={
@@ -128,8 +137,8 @@ class Character{
 			dead:null
 		}
 	}
-	isMinotaur(){
-		this.name='Minotaur',
+	isSkeleton(){
+		this.name='Skeleton',
 		this.hero=false,
 		this.usedSkill=null,
 		this.stats={
@@ -150,7 +159,7 @@ class Character{
 			cooldown:3,
 			maxCooldown:3,
 			skill1:{
-				name:"Bash",
+				name:"Slice",
 				type:"physical",
 				multi:1,
 			},
@@ -215,7 +224,7 @@ let skill1=()=>{
 		turnResult(player,enemy,hitResult(player,enemy))
         textUI.updateUI(textUI.right)
 		if (game.checkAlive(enemy)){
-			setTimeout(()=>{enemyTurn(enemy,player)},2.5*1000)
+			enemyGo()
 		}
 		else game.endBattle(enemy)	
 	}
@@ -224,12 +233,11 @@ let skill1=()=>{
 let skill2=()=>{
 	if(game.battleOn){
 		player.usedSkill=player.skills.skill2
-		console.log(player.usedSkill.cooldown)
 		if (player.usedSkill.cooldown<=0){
 			turnResult(player,enemy,hitResult(player,enemy))
       		textUI.updateUI(textUI.right)
 			if (game.checkAlive(enemy)){
-				setTimeout(()=>{enemyTurn(enemy,player)},2.5*1000)
+				enemyGo()
 			}
 			else game.endBattle(enemy)	
 		}
@@ -237,6 +245,7 @@ let skill2=()=>{
 			game.battleResults.skill="On cooldown "+player.usedSkill.cooldown+" turns left"
 			game.battleResults.damage=""
 			textUI.updateUI(textUI.left)
+			game.warning=true
 		}
 	}
 }
@@ -249,7 +258,7 @@ let setGuard=()=>{
 		game.battleResults.damage=""
 		textUI.updateUI(textUI.left)
 		if (game.checkAlive(enemy)){
-			setTimeout(()=>{enemyTurn(enemy,player)},2.5*1000)
+			enemyGo()
 		}
 		else game.endBattle(enemy)	
 	}
@@ -265,7 +274,7 @@ let drinkHPot=()=>{
 			textUI.updateUI(textUI.left)
        		updateHPot()
 			if (game.checkAlive(enemy)){
-				setTimeout(()=>{enemyTurn(enemy,player)},2.5*1000)
+				enemyGo()
 			}
 			else game.endBattle(enemy)
 		}
@@ -273,11 +282,22 @@ let drinkHPot=()=>{
 			game.battleResults.skill="Out of health potions!"
 			game.battleResults.damage=""
 			textUI.updateUI(textUI.left)
+			game.warning=true
 
 		}
 	}		
 }	
 //---The Functions---
+
+let enemyGo=()=>{
+	setTimeout(()=>{
+		enemyTurn(enemy,player)
+	},2.5*1000)
+	setTimeout(()=>{
+		game.rounds++
+		updateRounds()
+	},4.5*1000)
+}
 
 let randomNum=function(mina, maxa){
 	let min = Math.ceil(mina);
@@ -309,6 +329,7 @@ let turnResult= function(attacker,defender,hitResult){
 	else{
 		game.battleResults.damage='Miss'
 	}
+	game.updateHealth(attacker,defender)
 	console.log("player "+player.stats.health)	
 	console.log("enemy "+enemy.stats.health)
 }
@@ -318,7 +339,6 @@ let enemyTurn=function(attacker,defender){
 		attacker.usedSkill=attacker.skills.skill1
 		turnResult(attacker,defender,hitResult(attacker,defender))
 		attacker.skills.cooldown--
-		// leftDamageUI()
 		textUI.updateUI(textUI.left)
 		if (!game.checkAlive(player)){
 			game.endBattle(player)
@@ -331,17 +351,15 @@ let enemyTurn=function(attacker,defender){
 		attacker.skills.ready=false
 		attacker.skills.cooldown=attacker.skills.maxCooldown
 		textUI.updateUI(textUI.left)
-		// leftDamageUI()
 		if (!game.checkAlive(player)){
 			game.endBattle(player)
 		}
 	}
 	else{
 		attacker.skills.ready=true
-		game.battleResults.skill="The "+attacker.name+ " is rearing up for a big hit!"
+		game.battleResults.skill=attacker.name+ " is readying a big hit!"
 		game.battleResults.damage=""
 		textUI.updateUI(textUI.right)
-		// rightDamageUI()
 		if (!game.checkAlive(player)){
 			game.endBattle(player)
 		}
@@ -351,8 +369,9 @@ let enemyTurn=function(attacker,defender){
 let game=new Game()
 let player=new Character()
 player.isPlayer()
+player.showHealth(240,250)
 game.createEnemies('boss',1)
 let enemy=game.enemyList[0]
-enemy.showHealth()
+enemy.showHealth(930,250)
 let help=document.querySelector('.help')
 help.addEventListener('click',game.helpPage)

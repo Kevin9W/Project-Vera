@@ -1,16 +1,6 @@
 //---The Setup---
 let canvas = document.querySelector('.canvas');
 let context = canvas.getContext('2d');
-window.requestAnimFrame = (function() {
-  return window.requestAnimationFrame ||
-    window.webkitRequestAnimationFrame ||
-    window.mozRequestAnimationFrame ||
-    window.oRequestAnimationFrame ||
-    window.msRequestAnimationFrame ||
-    function(callback) {
-      window.setTimeout(callback, 1000 / 60);
-    };
-})(); 
 class Button{
     constructor(x,y,w,h,r){
         this.x=x,
@@ -41,13 +31,18 @@ class Button{
 let textUI={
     right:{
         side:'right',
-        x:1000,
-        y:200
+        x:1090,
+        y:100
     },
     left:{
         side:'left',
         x:200,
-        y:200
+        y:100
+    },
+    center:{
+        side:'center',
+        x:640,
+        y:400
     },
     updateUI:function(side){
         context.font = '16pt Cinzel, serif';
@@ -57,52 +52,127 @@ let textUI={
         context.fillText(text, side.x, side.y);
         setTimeout(()=>{
             if (side.side=="right"){
-                context.clearRect(side.x-(12*text.length),side.y-19,(12*text.length),22);
+                context.clearRect(side.x-(12*text.length),side.y-19,(13*text.length),22);
             }
-            else{
+            else if (side.side=="left"){
                 context.clearRect(side.x,side.y-19,(13*text.length),22);
             }
         },2*1000)
     } 
 }
+
+//---Sprite Animations---
+let heroImage= new Image();
+heroImage.src="css/assets/myIdle.png"
+let enemyImage= new Image();
+enemyImage.src="css/assets/undead_attack.png"
+let heroSprite=sprite({
+    context:context,
+    width:600,
+    height:600,
+    image:heroImage
+});
+let enemySprite=sprite({
+    context:context,
+    width:600,
+    height:600,
+    image:enemyImage
+});
+function sprite (options) {         
+    let that = {};          
+    that.context = options.context;
+    that.width = options.width;
+    that.height = options.height;
+    that.image = options.image;
+    frameIndex=0
+    tickCount=0
+    ticksPerFrame=options.ticksPerFrame||0;
+    that.render = function (type) {
+        if (type=='hero'){
+            that.context.drawImage(
+                that.image,
+                0,
+                0,
+                that.width,
+                that.height,
+                0,
+                50,
+                that.width,
+                that.height);
+        }
+        else{
+            that.context.drawImage(
+                that.image,
+                0,
+                0,
+                that.width,
+                that.height,
+                680,
+                225,
+                that.width,
+                that.height);
+        }
+    }
+    return that;
+
+}
+window.onload=function(){
+    heroSprite.render('hero');
+    enemySprite.render('enemy');
+}
 //---Skill 1---
-let skill1Button=new Button(515,550,100,50,5)
+let skill1Button=new Button(434,660,100,50,5)
 skill1Button.makeButton()
 context.font = '16pt Cinzel, serif';
 context.fillStyle = '#000000';
-context.fillText('Slash', 535, 581);
+context.fillText('Slash', 453, 691);
 //---Skill 2---
-let skill2Button=new Button(665,550,100,50,5)
+let skill2Button=new Button(538,660,100,50,5)
 skill2Button.makeButton()
 context.font = '16pt Cinzel, serif';
 context.fillStyle = '#000000';
-context.fillText('Fireball', 670, 581);
+context.fillText('Fireball', 541, 691);
 //---Skill 2---
-let guardButton=new Button(590,605,100,50,5)
+let guardButton=new Button(642,660,100,50,5)
 guardButton.makeButton()
 context.font = '16pt Cinzel, serif';
 context.fillStyle = '#000000';
-context.fillText('Guard', 602, 636);
+context.fillText('Guard', 655, 691);
 //---Skill 2---
-let hPotButton=new Button(590,660,100,50,5)
+let hPotButton=new Button(746,660,100,50,5)
 hPotButton.makeButton()
 context.font = '16pt Cinzel, serif';
 context.fillStyle = '#000000';
-context.fillText('Health', 600, 682);
-context.fillText('Potion', 600, 702);
-let hPotAmount=new Button(690,685,25,25,12)
+context.fillText('Health', 756, 682);
+context.fillText('Potion', 756, 702);
+let hPotAmount=new Button(846,685,25,25,12)
 hPotAmount.makeButton()
 updateHPot=()=>{
-    context.clearRect(690,685,25,25);
-    let hPotAmount=new Button(690,685,25,25,12)
+    context.clearRect(846,685,25,25);
+    let hPotAmount=new Button(846,685,25,25,12)
     hPotAmount.makeButton()
     context.font = '16pt Crimson Text, serif';
     context.fillStyle = '#000000';
-    context.fillText(player.equipment.items.hPot.amount, 698, 704);
+    context.fillText(player.equipment.items.hPot.amount, 854, 704);
 
 }
 updateHPot()
-
+//---Rounds---
+let rounds=new Button(620,50,40, 40,20)
+rounds.makeButton()
+updateRounds=()=>{
+    context.clearRect(620,50,40,40);
+    let hPotAmount=new Button(620,50,40,40,20)
+    hPotAmount.makeButton()
+    context.font = '18pt Crimson Text, serif';
+    context.textAlign='center'
+    context.fillStyle = '#000000';
+    context.fillText(game.rounds, 640, 77);
+}
+updateRounds()
+context.font = '16pt Cinzel, serif';
+context.fillStyle = '#000000';
+context.fillText('Round', 640, 40);
 //---The Functions---
 let getMousePos=function(canvas, event) {
     let rect = canvas.getBoundingClientRect();
@@ -112,15 +182,22 @@ let getMousePos=function(canvas, event) {
     };
 }
 
-
 let isInside=function(pos, rect){
     return pos.x > rect.x && pos.x < rect.x+rect.w && pos.y < rect.y+rect.h && pos.y > rect.y
 }
 let noClick=()=>{
     canvas.removeEventListener('click', clickHere);
-    setTimeout(()=>{
-        clickReady()
-    },4*1000)
+    if (game.warning){
+        setTimeout(()=>{
+            clickReady()
+        },2*1000)
+        game.warning=false
+    }
+    else{
+        setTimeout(()=>{
+            clickReady()
+        },4*1000)
+    }
 }
 let clickHere=function(evt){
         let mousePos = getMousePos(canvas, evt);
