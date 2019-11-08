@@ -12,3 +12,5 @@ The minimum viable product user story will flow as such
 7. Should the player win they will be prompted with a congratulation screen. Should they lose, they will be presented with a game over screen. In both cases they will have the option to start over again.
 
 This is the overview of how the MVP will play out. The desired product along with stretch goals in a table format is included in a pdf within the repo. A wireframe is also included for both the MVP and stretch goals 
+
+https://kevin9w.github.io/Project-Vera/
